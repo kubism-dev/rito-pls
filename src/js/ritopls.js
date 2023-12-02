@@ -61,11 +61,16 @@ async function getMatchIds(puuid) {
  * Dort sind die Daten der einzelnen Spieler enthalten. Inklusive Kills, Deaths, Assists, etc.
  * @see https://developer.riotgames.com/apis#match-v5/GET_getMatch
  * @param {string} matchId - Die ID des Matches.
+ * @param {number} startNumber - Die Startnummer des Matches, beginnend bei 0. Damit kann man noch spätere Matches abrufen.
+ * @param {number} countNumber - Die Anzahl der Matches die beim Abruf zurückgegeben werden sollen.
  * @returns {Promise<Object>} Die Daten des Matches.
  */
+const startNumber = 0;
+const countNumber = 100;
+
 async function getMatchData(matchId) {
     try {
-        const response = await riotApiEurope.get(`/lol/match/v5/matches/${matchId}?api_key=${apiKey}`);
+        const response = await riotApiEurope.get(`/lol/match/v5/matches/${matchId}?start=${startNumber}&count=${countNumber}%api_key=${apiKey}`);
         return response.data;
     } catch (error) {
         console.error('Fehler beim Abrufen der Match-Daten:', error);
