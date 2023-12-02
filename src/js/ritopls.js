@@ -80,7 +80,9 @@ async function getMatchData(matchId) {
  * @returns {Promise<Object>} Eine Statistik der am häufigsten gespielten Champions.
  */
 async function getMostPlayedChampions(puuid) {
-    const throttledGetMatchData = throttlePromise(getMatchData, 500);
+    // Throttling der API calls, um die Rate Limits nicht zu überschreiten
+    const throttledGetMatchData = throttlePromise(getMatchData, 2000);
+
     try {
         const matchIds = await getMatchIds(puuid);
         const championStats = {};
