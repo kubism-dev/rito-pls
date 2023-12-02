@@ -44,11 +44,16 @@ async function getAccountIdByName(name) {
  * Jede MatchID ist ein API call. Deswegen müsste man die Results cachen und dann nur die neuen Matches abrufen.
  * @see https://developer.riotgames.com/apis#match-v5/GET_getMatchIdsByPUUID
  * @param {string} puuid - Die Konto-ID des Benutzers.
+ * @param {number} startNumber - Die Startnummer des Matches, beginnend bei 0. Damit kann man noch spätere Matches abrufen.
+ * @param {number} countNumber - Die Anzahl der Matches die beim Abruf zurückgegeben werden sollen.
  * @returns {Promise<string[]>} Eine Liste von Match-IDs.
  */
+const startNumber = 0;
+const countNumber = 50;
+
 async function getMatchIds(puuid) {
     try {
-        const response = await riotApiEurope.get(`/lol/match/v5/matches/by-puuid/${puuid}/ids?api_key=${apiKey}`);
+        const response = await riotApiEurope.get(`/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${startNumber}&count=${countNumber}&api_key=${apiKey}`);
         return response.data;
     } catch (error) {
         console.error('Fehler beim Abrufen der Match-IDs:', error);
@@ -61,16 +66,12 @@ async function getMatchIds(puuid) {
  * Dort sind die Daten der einzelnen Spieler enthalten. Inklusive Kills, Deaths, Assists, etc.
  * @see https://developer.riotgames.com/apis#match-v5/GET_getMatch
  * @param {string} matchId - Die ID des Matches.
- * @param {number} startNumber - Die Startnummer des Matches, beginnend bei 0. Damit kann man noch spätere Matches abrufen.
- * @param {number} countNumber - Die Anzahl der Matches die beim Abruf zurückgegeben werden sollen.
  * @returns {Promise<Object>} Die Daten des Matches.
  */
-const startNumber = 0;
-const countNumber = 100;
 
 async function getMatchData(matchId) {
     try {
-        const response = await riotApiEurope.get(`/lol/match/v5/matches/${matchId}?start=${startNumber}&count=${countNumber}%api_key=${apiKey}`);
+        const response = await riotApiEurope.get(`/lol/match/v5/matches/${matchId}?api_key=${apiKey}`);
         return response.data;
     } catch (error) {
         console.error('Fehler beim Abrufen der Match-Daten:', error);
@@ -86,7 +87,7 @@ async function getMatchData(matchId) {
  */
 async function getMostPlayedChampions(puuid) {
     // Throttling der API calls, um die Rate Limits nicht zu überschreiten
-    const throttledGetMatchData = throttlePromise(getMatchData, 2000);
+    const throttledGetMatchData = throttlePromise(getMatchData, 500);
 
     try {
         const matchIds = await getMatchIds(puuid);
