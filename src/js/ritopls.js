@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { throttlePromise } from './helpers.js';
 
 /**
  * Daten befinden sich in der .env-Datei.
@@ -79,12 +80,13 @@ async function getMatchData(matchId) {
  * @returns {Promise<Object>} Eine Statistik der am häufigsten gespielten Champions.
  */
 async function getMostPlayedChampions(puuid) {
+    const throttledGetMatchData = throttlePromise(getMatchData, 500);
     try {
         const matchIds = await getMatchIds(puuid);
         const championStats = {};
 
         for (const matchId of matchIds) {
-            const matchData = await getMatchData(matchId);
+            const matchData = await throttledGetMatchData(matchId);
             const participant = matchData.info.participants.find(p => p.puuid === puuid);
 
             if (participant) {
